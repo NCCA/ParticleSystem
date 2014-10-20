@@ -1,6 +1,6 @@
 #include "Particle.h"
 #include <ngl/Random.h>
-#include <ngl/TransformStack.h>
+#include <ngl/Transformation.h>
 #include <ngl/ShaderLib.h>
 #include <ngl/VAOPrimitives.h>
 /// @brief ctor
