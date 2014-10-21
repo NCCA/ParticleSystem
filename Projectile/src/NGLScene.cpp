@@ -27,7 +27,6 @@ NGLScene::NGLScene(QWindow *_parent) : OpenGLWindow(_parent)
   m_spinXFace=0;
   m_spinYFace=0;
   setTitle("Simple Projectiles");
-  m_particleTimer=startTimer(20);
 
 
 }
@@ -134,6 +133,8 @@ void NGLScene::initialize()
   m_text->setScreenSize(width(),height());
   // as re-size is not explicitly called we need to do this.
   glViewport(0,0,width(),height());
+  m_particleTimer=startTimer(20);
+
 }
 
 
