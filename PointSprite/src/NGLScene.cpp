@@ -78,8 +78,8 @@ void NGLScene::initialize()
   // we are creating a shader called Phong
   shader->createShaderProgram("PointSprite");
   // now we are going to create empty shaders for Frag and Vert
-  shader->attachShader("PointSpriteVertex",ngl::VERTEX);
-  shader->attachShader("PointSpriteFragment",ngl::FRAGMENT);
+  shader->attachShader("PointSpriteVertex",ngl::ShaderType::VERTEX);
+  shader->attachShader("PointSpriteFragment",ngl::ShaderType::FRAGMENT);
   // attach the source
   shader->loadShaderSource("PointSpriteVertex","shaders/Vertex.vs");
   shader->loadShaderSource("PointSpriteFragment","shaders/Fragment.fs");
@@ -99,8 +99,8 @@ void NGLScene::initialize()
 
   shader->createShaderProgram("Colour");
 
-  shader->attachShader("ColourVertex",ngl::VERTEX);
-  shader->attachShader("ColourFragment",ngl::FRAGMENT);
+  shader->attachShader("ColourVertex",ngl::ShaderType::VERTEX);
+  shader->attachShader("ColourFragment",ngl::ShaderType::FRAGMENT);
   shader->loadShaderSource("ColourVertex","shaders/Colour.vs");
   shader->loadShaderSource("ColourFragment","shaders/Colour.fs");
 
