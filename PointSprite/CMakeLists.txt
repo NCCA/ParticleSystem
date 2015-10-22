@@ -4,6 +4,8 @@ set(PROJECT_NAME PointSprite)
 project(${PROJECT_NAME})
 #Bring the headers into the project (local ones)
 include_directories(include $ENV{HOME}/NGL/include)
+# Set to C++ 11
+set(CMAKE_CXX_STANDARD 11)
 
 #the file(GLOB...) allows for wildcard additions of our src dir
 set(SOURCES ${PROJECT_SOURCE_DIR}/src/main.cpp  
