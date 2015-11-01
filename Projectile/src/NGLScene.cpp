@@ -19,7 +19,7 @@ const static float INCREMENT=0.01;
 //----------------------------------------------------------------------------------------------------------------------
 const static float ZOOM=0.1;
 
-NGLScene::NGLScene(QWindow *_parent) : OpenGLWindow(_parent)
+NGLScene::NGLScene()
 {
   // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
   m_rotate=false;
@@ -27,8 +27,6 @@ NGLScene::NGLScene(QWindow *_parent) : OpenGLWindow(_parent)
   m_spinXFace=0;
   m_spinYFace=0;
   setTitle("Simple Projectiles");
-
-
 }
 
 
@@ -37,22 +35,17 @@ NGLScene::~NGLScene()
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 }
 
-void NGLScene::resizeEvent(QResizeEvent *_event )
+void NGLScene::resizeGL(QResizeEvent *_event )
 {
-  if(isExposed())
-  {
-  int w=_event->size().width();
-  int h=_event->size().height();
-  // set the viewport for openGL
-  glViewport(0,0,w,h);
+  m_width=_event->size().width()*devicePixelRatio();
+  m_height=_event->size().height()*devicePixelRatio();
   // now set the camera size values as the screen size has changed
-  m_cam->setShape(45,(float)w/h,0.05,350);
-  renderLater();
-  }
+  m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
+
 }
 
 
-void NGLScene::initialize()
+void NGLScene::initializeGL()
 {
   // we must call this first before any other GL commands to load and link the
   // gl commands from the lib, if this is not done program will crash
@@ -69,10 +62,10 @@ void NGLScene::initialize()
   ngl::Vec3 from(0,5,18);
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
-  m_cam= new ngl::Camera(from,to,up);
+  m_cam.set(from,to,up);
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
-  m_cam->setShape(40,(float)720.0/576.0,0.5,150);
+  m_cam.setShape(40,(float)720.0/576.0,0.5,150);
   // now to load the shader and set the values
   // grab an instance of shader manager
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
@@ -112,7 +105,7 @@ void NGLScene::initialize()
   // now create our light this is done after the camera so we can pass the
   // transpose of the projection matrix to the light to do correct eye space
   // transformations
-  ngl::Mat4 iv=m_cam->getViewMatrix();
+  ngl::Mat4 iv=m_cam.getViewMatrix();
   iv.transpose();
   light.setTransform(iv);
   light.setAttenuation(1,0,0);
@@ -122,12 +115,12 @@ void NGLScene::initialize()
   ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
 
   prim->createSphere("sphere",0.1,10);
-  m_wind=new ngl::Vec3(1,1,1);
-  m_emitter = new Emitter(ngl::Vec3(0,0,0),400,m_wind);
-  m_emitter->setCam(m_cam);
+  m_wind.set(1,1,1);
+  m_emitter.reset(new Emitter(ngl::Vec3(0,0,0),400,&m_wind));
+  m_emitter->setCam(&m_cam);
   m_emitter->setShaderName("Phong");
 
-  m_text=new ngl::Text(QFont("Arial",14));
+  m_text.reset( new ngl::Text(QFont("Arial",14)));
   m_text->setScreenSize(width(),height());
   // as re-size is not explicitly called we need to do this.
   glViewport(0,0,width(),height());
@@ -138,14 +131,15 @@ void NGLScene::initialize()
 
 
 
-void NGLScene::render()
+void NGLScene::paintGL()
 {
   // grab an instance of the shader manager
   // clear the screen and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glViewport(0,0,m_width,m_height);
   m_emitter->draw();
   m_text->setColour(1,1,1);
-  QString text=QString("Wind Vector  %1 %2 %3").arg(m_wind->m_x).arg(m_wind->m_y).arg(m_wind->m_z);
+  QString text=QString("Wind Vector  %1 %2 %3").arg(m_wind.m_x).arg(m_wind.m_y).arg(m_wind.m_z);
   m_text->renderText(10,20,text);
  }
 
@@ -163,7 +157,7 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
     m_spinYFace += (float) 0.5f * diffx;
     m_origX = _event->x();
     m_origY = _event->y();
-    renderLater();
+    update();
 
   }
         // right mouse translate code
@@ -175,7 +169,7 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
     m_origYPos=_event->y();
     m_modelPos.m_x += INCREMENT * diffX;
     m_modelPos.m_y -= INCREMENT * diffY;
-    renderLater();
+    update();
 
    }
 }
@@ -231,7 +225,7 @@ void NGLScene::wheelEvent(QWheelEvent *_event)
 	{
 		m_modelPos.m_z-=ZOOM;
 	}
-	renderLater();
+	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -243,20 +237,19 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   {
   // escape key to quite
   case Qt::Key_Escape : QGuiApplication::exit(EXIT_SUCCESS); break;
-    case Qt::Key_Up : m_wind->m_y+=0.1; break;
-    case Qt::Key_Down : m_wind->m_y-=0.1; break;
-    case Qt::Key_Left : m_wind->m_x+=0.1; break;
-    case Qt::Key_Right : m_wind->m_x-=0.1; break;
+  case Qt::Key_Up : m_wind.m_y+=0.1; break;
+  case Qt::Key_Down : m_wind.m_y-=0.1; break;
+  case Qt::Key_Left : m_wind.m_x+=0.1; break;
+  case Qt::Key_Right : m_wind.m_x-=0.1; break;
 
-		case Qt::Key_I : m_wind->m_z+=0.1; break;
-		case Qt::Key_O : m_wind->m_z-=0.1; break;
+	case Qt::Key_I : m_wind.m_z+=0.1; break;
+	case Qt::Key_O : m_wind.m_z-=0.1; break;
 
-    case Qt::Key_Space : m_wind->set(1,1,1); break;
+  case Qt::Key_Space : m_wind.set(1,1,1); break;
   default : break;
   }
   // finally update the GLWindow and re-draw
-  //if (isExposed())
-    renderLater();
+    update();
 }
 
 void NGLScene::timerEvent(QTimerEvent *_event )
@@ -264,7 +257,7 @@ void NGLScene::timerEvent(QTimerEvent *_event )
 	if(_event->timerId() ==   m_particleTimer)
 	{
 		m_emitter->update();
-		renderNow();
+		update();
 	}
 
 		// re-draw GL

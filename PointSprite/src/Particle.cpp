@@ -5,10 +5,7 @@
 #include <ngl/VAOPrimitives.h>
 /// @brief ctor
 /// @param _pos the start position of the particle
-Particle::Particle(
-									 ngl::Vec3 _pos,
-                   float _var,
-                   ngl::Vec3 _upDir
+Particle::Particle(ngl::Vec3 _pos,float _var, ngl::Vec3 _upDir
   )
 {
 	m_pos=_pos;

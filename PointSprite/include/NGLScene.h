@@ -1,12 +1,12 @@
 #ifndef NGLSCENE_H__
 #define NGLSCENE_H__
-#include "OpenGLWindow.h"
 #include <ngl/PathCamera.h>
 #include <ngl/Colour.h>
 #include <ngl/Light.h>
 #include <ngl/Transformation.h>
 #include <ngl/Text.h>
 #include "Emitter.h"
+#include <QOpenGLWindow>
 #include <QTime>
 
 //----------------------------------------------------------------------------------------------------------------------
@@ -22,14 +22,14 @@
 /// put in this file
 //----------------------------------------------------------------------------------------------------------------------
 
-class NGLScene : public OpenGLWindow
+class NGLScene : public QOpenGLWindow
 {
   public:
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief ctor for our NGL drawing class
     /// @param [in] parent the parent window to the class
     //----------------------------------------------------------------------------------------------------------------------
-    NGLScene(QWindow *_parent=0);
+    NGLScene();
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief dtor must close down ngl and release OpenGL resources
     //----------------------------------------------------------------------------------------------------------------------
@@ -38,11 +38,11 @@ class NGLScene : public OpenGLWindow
     /// @brief the initialize class is called once when the window is created and we have a valid GL context
     /// use this to setup any default GL stuff
     //----------------------------------------------------------------------------------------------------------------------
-    void initialize();
+    void initializeGL();
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief this is called everytime we want to draw the scene
     //----------------------------------------------------------------------------------------------------------------------
-    void render();
+    void paintGL();
 
 private:
     //----------------------------------------------------------------------------------------------------------------------
@@ -78,10 +78,18 @@ private:
     //----------------------------------------------------------------------------------------------------------------------
     int m_origYPos;
     //----------------------------------------------------------------------------------------------------------------------
+    /// @brief window width
+    //----------------------------------------------------------------------------------------------------------------------
+    int m_width;
+    //----------------------------------------------------------------------------------------------------------------------
+    /// @brief window height
+    //----------------------------------------------------------------------------------------------------------------------
+    int m_height;
+    //----------------------------------------------------------------------------------------------------------------------
     /// @brief Our Camera
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief Our Camera
-    ngl::PathCamera *m_cam;
+    std::unique_ptr<ngl::PathCamera> m_cam;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief transformation stack for the gl transformations etc
     //----------------------------------------------------------------------------------------------------------------------
@@ -97,12 +105,12 @@ private:
     int m_fps;
     int m_frames;
     bool m_animate;
-    Emitter *m_emitter1;
-    Emitter *m_emitter2;
-    Emitter *m_emitter3;
+    std::unique_ptr<Emitter> m_emitter1;
+    std::unique_ptr<Emitter> m_emitter2;
+    std::unique_ptr<Emitter> m_emitter3;
     /// @brief the particle update timer
     int m_particleTimer;
-    ngl::Text *m_text;
+    std::unique_ptr<ngl::Text> m_text;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief method to load transform matrices to the shader
     //----------------------------------------------------------------------------------------------------------------------
@@ -111,7 +119,7 @@ private:
     /// @brief Qt Event called when the window is re-sized
     /// @param [in] _event the Qt event to query for size etc
     //----------------------------------------------------------------------------------------------------------------------
-    void resizeEvent(QResizeEvent *_event);
+    void resizeGL(QResizeEvent *_event);
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief Qt Event called when a key is pressed
     /// @param [in] _event the Qt event to query for size etc

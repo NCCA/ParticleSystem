@@ -20,7 +20,7 @@ const static float INCREMENT=0.01;
 //----------------------------------------------------------------------------------------------------------------------
 const static float ZOOM=0.1;
 
-NGLScene::NGLScene(QWindow *_parent) : OpenGLWindow(_parent)
+NGLScene::NGLScene()
 {
   // re-size the widget to that of the parent (in this case the GLFrame passed in on construction)
   m_rotate=false;
@@ -41,22 +41,15 @@ NGLScene::~NGLScene()
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 }
 
-void NGLScene::resizeEvent(QResizeEvent *_event )
+void NGLScene::resizeGL(QResizeEvent *_event )
 {
-  if(isExposed())
-  {
-  int w=_event->size().width();
-  int h=_event->size().height();
-  // set the viewport for openGL
-  glViewport(0,0,w,h);
-  // now set the camera size values as the screen size has changed
-  m_cam->setShape(45,(float)w/h,0.05,350);
-  renderLater();
-  }
+  m_width=_event->size().width()*devicePixelRatio();
+  m_height=_event->size().height()*devicePixelRatio();
+
 }
 
 
-void NGLScene::initialize()
+void NGLScene::initializeGL()
 {
   // we must call this first before any other GL commands to load and link the
   // gl commands from the lib, if this is not done program will crash
@@ -67,7 +60,7 @@ void NGLScene::initialize()
   glEnable(GL_DEPTH_TEST);
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
-  m_cam = new ngl::PathCamera(ngl::Vec4(0,1,-0.2),"data/loop.dat",0.001);
+  m_cam.reset( new ngl::PathCamera(ngl::Vec4(0,1,-0.2),"data/loop.dat",0.001));
   m_cam->setShape(40.0,1024.0/720.0,0.5,150.0);
   m_cam->updateLooped();
   // now to load the shader and set the values
@@ -124,12 +117,12 @@ void NGLScene::initialize()
   glPointParameterf( GL_POINT_SIZE_MAX, 32.0f );
 
 
-  m_emitter1 = new Emitter(ngl::Vec3(0,0,0),"textures/SmokeTest.tiff",6000);
-  m_emitter2 = new Emitter(ngl::Vec3(2,0,2),"textures/SmokeTest2.tiff",6000);
-  m_emitter3 = new Emitter(ngl::Vec3(2,0,2),"textures/SmokeTest3.tiff",6000);
-  m_emitter1->setCam(m_cam);
-  m_emitter2->setCam(m_cam);
-  m_emitter3->setCam(m_cam);
+  m_emitter1.reset(  new Emitter(ngl::Vec3(0,0,0),"textures/SmokeTest.tiff",6000));
+  m_emitter2.reset(  new Emitter(ngl::Vec3(2,0,2),"textures/SmokeTest2.tiff",6000));
+  m_emitter3.reset(  new Emitter(ngl::Vec3(2,0,2),"textures/SmokeTest3.tiff",6000));
+  m_emitter1->setCam(m_cam.get());
+  m_emitter2->setCam(m_cam.get());
+  m_emitter3->setCam(m_cam.get());
   m_emitter1->setShaderName("PointSprite");
   m_emitter2->setShaderName("PointSprite");
   m_emitter3->setShaderName("PointSprite");
@@ -156,10 +149,11 @@ void NGLScene::initialize()
 
 
 
-void NGLScene::render()
+void NGLScene::paintGL()
 {
   // grab an instance of the shader manager
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
+  glViewport(0,0,m_width,m_height);
   (*shader)["PointSprite"]->use();
   // clear the screen and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -213,7 +207,7 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
     m_spinYFace += (float) 0.5f * diffx;
     m_origX = _event->x();
     m_origY = _event->y();
-    renderLater();
+    update();
 
   }
         // right mouse translate code
@@ -225,7 +219,7 @@ void NGLScene::mouseMoveEvent (QMouseEvent * _event)
     m_origYPos=_event->y();
     m_modelPos.m_x += INCREMENT * diffX;
     m_modelPos.m_y -= INCREMENT * diffY;
-    renderLater();
+    update();
 
    }
 }
@@ -281,7 +275,7 @@ void NGLScene::wheelEvent(QWheelEvent *_event)
 	{
 		m_modelPos.m_z-=ZOOM;
 	}
-	renderLater();
+	update();
 }
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -296,9 +290,7 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
 
   default : break;
   }
-  // finally update the GLWindow and re-draw
-  //if (isExposed())
-    renderLater();
+    update();
 }
 
 void NGLScene::timerEvent(QTimerEvent *_event )
@@ -314,6 +306,6 @@ void NGLScene::timerEvent(QTimerEvent *_event )
 	{
 		m_cam->updateLooped();
 	}
-	renderNow();
+	update();
 		// re-draw GL
 }

@@ -12,12 +12,11 @@
 
 
 
-NGLScene::NGLScene(QWindow *_parent) : OpenGLWindow(_parent)
+NGLScene::NGLScene()
 {
   setTitle("Simple Particles");
   m_fps=0;
   m_frames=0;
-  m_timer.start();
 
 }
 
@@ -27,22 +26,16 @@ NGLScene::~NGLScene()
   std::cout<<"Shutting down NGL, removing VAO's and Shaders\n";
 }
 
-void NGLScene::resizeEvent(QResizeEvent *_event )
+void NGLScene::resizeGL(QResizeEvent *_event )
 {
-  if(isExposed())
-  {
-  int w=_event->size().width();
-  int h=_event->size().height();
-  // set the viewport for openGL
-  glViewport(0,0,w,h);
+  m_width=_event->size().width()*devicePixelRatio();
+  m_height=_event->size().height()*devicePixelRatio();
   // now set the camera size values as the screen size has changed
-  m_cam->setShape(45,(float)w/h,0.05,350);
-  renderLater();
-  }
+  m_cam.setShape(45.0f,(float)width()/height(),0.05f,350.0f);
 }
 
 
-void NGLScene::initialize()
+void NGLScene::initializeGL()
 {
   // we must call this first before any other GL commands to load and link the
   // gl commands from the lib, if this is not done program will crash
@@ -59,10 +52,10 @@ void NGLScene::initialize()
   ngl::Vec3 from(8,8,8);
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
-  m_cam= new ngl::Camera(from,to,up);
+  m_cam.set(from,to,up);
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
-  m_cam->setShape(60,(float)720.0/576.0,0.5,150);
+  m_cam.setShape(60,(float)720.0/576.0,0.5,150);
   // now to load the shader and set the values
   // grab an instance of shader manager
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
@@ -102,7 +95,7 @@ void NGLScene::initialize()
   // now create our light this is done after the camera so we can pass the
   // transpose of the projection matrix to the light to do correct eye space
   // transformations
-  ngl::Mat4 iv=m_cam->getViewMatrix();
+  ngl::Mat4 iv=m_cam.getViewMatrix();
   iv.transpose();
   light.setTransform(iv);
   light.setAttenuation(1,0,0);
@@ -111,30 +104,27 @@ void NGLScene::initialize()
   ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
 
   prim->createSphere("sphere",0.1,10);
-  m_emitter = new Emitter(ngl::Vec3(0,0,0),2000);
-  m_emitter->setCam(m_cam);
+  m_emitter.reset(  new Emitter(ngl::Vec3(0,0,0),2000));
+  m_emitter->setCam(&m_cam);
   m_emitter->setShaderName("Phong");
-  m_text=new ngl::Text(QFont("Arial",14));
+  m_text.reset( new ngl::Text(QFont("Arial",14)));
   m_text->setScreenSize(width(),height());
   // as re-size is not explicitly called we need to do this.
   glViewport(0,0,width(),height());
   m_fpsTimer =startTimer(0);
+  m_timer.start();
 
 }
 
 
 
 
-void NGLScene::render()
+void NGLScene::paintGL()
 {
   // clear the screen and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-
+  glViewport(0,0,m_width,m_height);
   m_emitter->draw();
-
-
   // calculate and draw FPS
   ++m_frames;
   QString text=QString("Particle demo %1 fps").arg(m_fps);
@@ -190,9 +180,7 @@ void NGLScene::keyPressEvent(QKeyEvent *_event)
   case Qt::Key_N : showNormal(); break;
   default : break;
   }
-  // finally update the GLWindow and re-draw
-  //if (isExposed())
-    renderLater();
+  update();
 }
 
 void NGLScene::timerEvent(QTimerEvent *_event )
@@ -208,5 +196,5 @@ void NGLScene::timerEvent(QTimerEvent *_event )
 		}
 	 }
 		// re-draw GL
-renderNow();
+update();
 }
