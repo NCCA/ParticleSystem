@@ -7,6 +7,8 @@
 #include "Emitter.h"
 #include <QTime>
 #include <QOpenGLWindow>
+#include <memory>
+
 //----------------------------------------------------------------------------------------------------------------------
 /// @file NGLScene.h
 /// @brief this class inherits from the Qt OpenGLWindow and allows us to use NGL to draw OpenGL
@@ -42,6 +44,14 @@ class NGLScene : public QOpenGLWindow
     /// @brief this is called everytime we want to draw the scene
     //----------------------------------------------------------------------------------------------------------------------
     void paintGL();
+    //----------------------------------------------------------------------------------------------------------------------
+    /// @brief Qt Event called when the window is re-sized
+    /// @param [in] _event the Qt event to query for size etc
+    //----------------------------------------------------------------------------------------------------------------------
+    // Qt 5.5.1 must have this implemented and uses it
+    void resizeGL(QResizeEvent *_event);
+    // Qt 5.x uses this instead! http://doc.qt.io/qt-5/qopenglwindow.html#resizeGL
+    void resizeGL(int _w, int _h);
 
 private:
     //----------------------------------------------------------------------------------------------------------------------
@@ -67,11 +77,6 @@ private:
     /// @brief method to load transform matrices to the shader
     //----------------------------------------------------------------------------------------------------------------------
     void loadMatricesToShader();
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief Qt Event called when the window is re-sized
-    /// @param [in] _event the Qt event to query for size etc
-    //----------------------------------------------------------------------------------------------------------------------
-    void resizeGL(QResizeEvent *_event);
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief Qt Event called when a key is pressed
     /// @param [in] _event the Qt event to query for size etc

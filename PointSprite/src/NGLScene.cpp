@@ -31,8 +31,6 @@ NGLScene::NGLScene()
   m_fps=0;
   m_frames=0;
   m_animate=true;
-
-
 }
 
 
@@ -46,6 +44,12 @@ void NGLScene::resizeGL(QResizeEvent *_event )
   m_width=_event->size().width()*devicePixelRatio();
   m_height=_event->size().height()*devicePixelRatio();
 
+}
+
+void NGLScene::resizeGL(int _w , int _h)
+{
+  m_width=_w*devicePixelRatio();
+  m_height=_h*devicePixelRatio();
 }
 
 
