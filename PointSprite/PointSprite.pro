@@ -18,11 +18,13 @@ CONFIG-=app_bundle
 # Auto include all .cpp files in the project src directory (can specifiy individually if required)
 SOURCES+= $$PWD/src/Emitter.cpp  \
 					$$PWD/src/NGLScene.cpp \
+          $$PWD/src/NGLSceneMouseControls.cpp \
 					$$PWD/src/Particle.cpp \
 					$$PWD/src/main.cpp
 # same for the .h files
 HEADERS+= $$PWD/include/Emitter.h \
 					$$PWD/include/NGLScene.h \
+          $$PWD/include/WindowParams.h \
 					$$PWD/include/Particle.h
 # and add the include dir into the search path for Qt and make
 INCLUDEPATH +=./include

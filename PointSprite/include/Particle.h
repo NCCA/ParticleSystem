@@ -1,8 +1,7 @@
-#ifndef __PARTICLE_H__
-#define __PARTICLE_H__
+#ifndef PARTICLE_H_
+#define PARTICLE_H_
 
 #include <ngl/Vec3.h>
-#include <ngl/Colour.h>
 
 class Particle
 {
@@ -10,20 +9,13 @@ public :
 
 	/// @brief ctor
 	/// @param _pos the start position of the particle
-	Particle(
-            ngl::Vec3 _pos,
-						float _var,
-            ngl::Vec3 _upDir
-
-					);
+  Particle(ngl::Vec3 _pos,float _var, ngl::Vec3 _upDir	);
 	/// @brief a method to update the particle position
 	void update();
 	/// @brief mutator for the particle life
-	inline void setLifeTime(
-													 int _l
-													){m_lifetime=_l;}
-  inline ngl::Vec3 getPosition()const {return m_pos;}
-	inline GLfloat getLife() const {return m_currentLife;}
+  void setLifeTime(int _l){m_lifetime=_l;}
+  ngl::Vec3 getPosition()const {return m_pos;}
+  GLfloat getLife() const {return m_currentLife;}
 private :
 	/// @brief the curent particle position
   ngl::Vec3 m_pos;

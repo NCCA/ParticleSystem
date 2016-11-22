@@ -1,5 +1,5 @@
-#ifndef EMITTER_H__
-#define EMITTER_H__
+#ifndef EMITTER_H_
+#define EMITTER_H_
 #include <vector>
 #include <ngl/Vec3.h>
 #include <ngl/Camera.h>

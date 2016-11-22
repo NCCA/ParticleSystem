@@ -1,5 +1,5 @@
-#ifndef EMITTER_H__
-#define EMITTER_H__
+#ifndef EMITTER_H_
+#define EMITTER_H_
 #include <vector>
 #include <QTime>
 #include <ngl/Camera.h>
@@ -17,22 +17,22 @@ public :
 	/// @brief ctor
 	/// @param _pos the position of the emitter
 	/// @param _numParticles the number of particles to create
-	Emitter( ngl::Vec3 _pos, std::string _texture, int _numParticles );
+  Emitter(ngl::Vec3 _pos, std::string _texture, size_t _numParticles );
 	/// @brief a method to update each of the particles contained in the system
 	void update();
 	/// @brief a method to draw all the particles contained in the system
   void draw(const ngl::Mat4 &_mvp);
-	inline GLuint getTextureID() const {return m_textureID;}
-  inline void setCam(ngl::Camera *_cam){m_cam=_cam;}
-  inline ngl::Camera * getCam()const {return m_cam;}
-  inline void setShaderName(const std::string &_n){m_shaderName=_n;}
-  inline const std::string getShaderName()const {return m_shaderName;}
+  GLuint getTextureID() const {return m_textureID;}
+  void setCam(ngl::Camera *_cam){m_cam=_cam;}
+  ngl::Camera * getCam()const {return m_cam;}
+  void setShaderName(const std::string &_n){m_shaderName=_n;}
+  const std::string getShaderName()const {return m_shaderName;}
 
 private :
 	/// @brief the position of the emitter
   ngl::Vec3 m_pos;
 	/// @brief the number of particles
-	int m_numParticles;
+  size_t m_numParticles;
 	/// @brief the container for the particles
 	std::vector <Particle> m_particles;
 	/// @brief the container for the points passed to GL

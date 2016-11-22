@@ -1,10 +1,9 @@
-#ifndef NGLSCENE_H__
-#define NGLSCENE_H__
+#ifndef NGLSCENE_H_
+#define NGLSCENE_H_
 #include <ngl/Camera.h>
-#include <ngl/Colour.h>
-#include <ngl/Light.h>
 #include <ngl/Text.h>
 #include "Emitter.h"
+#include "WindowParams.h"
 #include <QTime>
 #include <QOpenGLWindow>
 #include <memory>
@@ -48,9 +47,6 @@ class NGLScene : public QOpenGLWindow
     /// @brief Qt Event called when the window is re-sized
     /// @param [in] _event the Qt event to query for size etc
     //----------------------------------------------------------------------------------------------------------------------
-    // Qt 5.5.1 must have this implemented and uses it
-    void resizeGL(QResizeEvent *_event);
-    // Qt 5.x uses this instead! http://doc.qt.io/qt-5/qopenglwindow.html#resizeGL
     void resizeGL(int _w, int _h);
 
 private:
@@ -64,13 +60,11 @@ private:
     int m_fps;
     int m_frames;
     //----------------------------------------------------------------------------------------------------------------------
-    /// @brief window width
+    /// @brief the windows params such as mouse and rotations etc
     //----------------------------------------------------------------------------------------------------------------------
-    int m_width;
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief window height
-    //----------------------------------------------------------------------------------------------------------------------
-    int m_height;QTime m_timer;
+    WinParams m_win;
+    ngl::Vec3 m_modelPos;
+    QTime m_timer;
     std::unique_ptr<Emitter> m_emitter;
     std::unique_ptr<ngl::Text> m_text;
     //----------------------------------------------------------------------------------------------------------------------
