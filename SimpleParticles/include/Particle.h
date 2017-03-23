@@ -1,5 +1,5 @@
-#ifndef PARTICLE_H__
-#define PARTICLE_H__
+#ifndef PARTICLE_H_
+#define PARTICLE_H_
 
 #include <ngl/Vec3.h>
 #include <ngl/Colour.h>
