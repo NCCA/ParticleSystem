@@ -4,6 +4,9 @@
 #include <ngl/Random.h>
 #include <ngl/VAOFactory.h>
 
+
+std::default_random_engine g_generator;
+
 Emitter::Emitter(ngl::Vec3 _pos, size_t  nParticles)
 {
   m_pos=_pos;
@@ -19,8 +22,15 @@ Emitter::Emitter(ngl::Vec3 _pos, size_t  nParticles)
 
 void Emitter::resetParticle(Particle &io_p)
 {
+  std::bernoulli_distribution distribution(0.5f);
+
   ngl::Random *rng=ngl::Random::instance();
+  io_p.respawn=distribution(g_generator);
   io_p.pos=m_pos;
+  io_p.life=0;
+
+  if(io_p.respawn==true)
+  {
   //io_p.dir=rng->getRandomVec3();
   io_p.dir.m_x=rng->randomNumber(1);
   io_p.dir.m_y=rng->randomPositiveNumber(0.2);
@@ -31,8 +41,7 @@ void Emitter::resetParticle(Particle &io_p)
   io_p.colour.m_g=rng->randomPositiveNumber(1.0);
   io_p.colour.m_b=rng->randomPositiveNumber(1.0);
   io_p.maxLife=80+rng->randomPositiveNumber(100);
-  io_p.life=0;
-
+  }
 }
 
 
@@ -45,7 +54,6 @@ void Emitter::draw()
     ngl::Vec3 c;
     ngl::Real size;
   };
-  std::cout<<"Part "<<sizeof(part)<<" data "<<sizeof(ngl::Vec3)+sizeof(ngl::Vec3)+sizeof(ngl::Real)<<"\n";
 
 
   std::vector<part> particle(m_particles.size());
@@ -55,7 +63,6 @@ void Emitter::draw()
     particle[i].c=m_particles[i].colour;
     particle[i].size=m_particles[i].life;
   }
-  std::cout<<"Part "<<sizeof(part)<<" data "<<sizeof(ngl::Vec3)+sizeof(ngl::Vec3)+sizeof(ngl::Real)<<"\n";
 
   m_vao->setData(ngl::SimpleVAO::VertexData(particle.size()*sizeof (part),
                                             particle[0].p.m_x));
@@ -74,7 +81,7 @@ void Emitter::update()
     p.pos+=p.dir;
     if(++p.life > p.maxLife)
     {
-      resetParticle(p);
+        resetParticle(p);
     }
 
   }

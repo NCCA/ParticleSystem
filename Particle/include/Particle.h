@@ -10,6 +10,7 @@ struct Particle
   ngl::Vec3 colour;
   int life=0;
   int maxLife;
+  bool respawn=false;
 };
 
 
