@@ -42,7 +42,7 @@ void Emitter::draw(const ngl::Mat4 &_mvp)
  }
  ngl::ShaderLib *shader = ngl::ShaderLib::instance();
  (*shader)[m_shaderName]->use();
- shader->setShaderParamFromMat4("MVP",_mvp);
+ shader->setUniform("MVP",_mvp);
  std::unique_ptr<ngl::AbstractVAO> vao(ngl::VAOFactory::createVAO("simpleVAO",GL_POINTS));
  vao->bind();
  vao->setData(ngl::AbstractVAO::VertexData( m_numParticles*sizeof(ngl::Vec3),m_particlePositions[0].m_x));

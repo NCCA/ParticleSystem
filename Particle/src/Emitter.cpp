@@ -5,7 +5,7 @@
 #include <ngl/VAOFactory.h>
 
 
-std::default_random_engine g_generator;
+static std::default_random_engine s_generator;
 
 Emitter::Emitter(ngl::Vec3 _pos, size_t  nParticles)
 {
@@ -22,25 +22,23 @@ Emitter::Emitter(ngl::Vec3 _pos, size_t  nParticles)
 
 void Emitter::resetParticle(Particle &io_p)
 {
-  std::bernoulli_distribution distribution(0.5f);
+  std::bernoulli_distribution distribution(0.5);
 
   ngl::Random *rng=ngl::Random::instance();
-  io_p.respawn=distribution(g_generator);
+  io_p.respawn=distribution(s_generator);
   io_p.pos=m_pos;
-  io_p.life=0;
+  io_p.life=5;
 
   if(io_p.respawn==true)
   {
-  //io_p.dir=rng->getRandomVec3();
-  io_p.dir.m_x=rng->randomNumber(1);
-  io_p.dir.m_y=rng->randomPositiveNumber(0.2);
-  io_p.dir.m_z=rng->randomNumber(1);
-  //io_p.dir.normalize();
+    io_p.dir.m_x=rng->randomNumber(1);
+    io_p.dir.m_y=rng->randomPositiveNumber(0.2f);
+    io_p.dir.m_z=rng->randomNumber(1);
 
-  io_p.colour.m_r=rng->randomPositiveNumber(1.0);
-  io_p.colour.m_g=rng->randomPositiveNumber(1.0);
-  io_p.colour.m_b=rng->randomPositiveNumber(1.0);
-  io_p.maxLife=80+rng->randomPositiveNumber(100);
+    io_p.colour.m_r=rng->randomPositiveNumber(1.0f);
+    io_p.colour.m_g=rng->randomPositiveNumber(1.0f);
+    io_p.colour.m_b=rng->randomPositiveNumber(1.0f);
+    io_p.maxLife=static_cast<int>(80+rng->randomPositiveNumber(100.0f));
   }
 }
 

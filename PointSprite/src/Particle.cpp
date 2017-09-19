@@ -15,9 +15,9 @@ Particle::Particle(ngl::Vec3 _pos,float _var, ngl::Vec3 _upDir
 	m_upDir=_upDir;
 	GLfloat theta=(rand->randomNumber(_var));
 	GLfloat phi=(rand->randomNumber(_var));
-	m_dir.m_x=(_upDir.m_x+sin(theta)*cos(phi))/_var;
-	m_dir.m_y=(_upDir.m_y+sin(theta)*cos(theta))/_var;
-	m_dir.m_z=(_upDir.m_z+cos(theta))/_var;
+  m_dir.m_x=(_upDir.m_x+sinf(theta)*cosf(phi))/_var;
+  m_dir.m_y=(_upDir.m_y+sinf(theta)*cosf(theta))/_var;
+  m_dir.m_z=(_upDir.m_z+cosf(theta))/_var;
 
 	m_lifetime=rand->randomPositiveNumber(250);
 	m_currentLife=0;
@@ -36,8 +36,8 @@ void Particle::update()
 		m_currentLife=0;
 		GLfloat theta=(rand->randomNumber(m_var));
 		GLfloat phi=(rand->randomNumber(m_var));
-		m_dir.m_x=(m_upDir.m_x+sin(theta)*cos(phi))/m_var;
-		m_dir.m_y=(m_upDir.m_y+sin(theta)*cos(theta))/m_var;
-		m_dir.m_z=(m_upDir.m_z+cos(theta))/m_var;
+    m_dir.m_x=(m_upDir.m_x+sinf(theta)*cosf(phi))/m_var;
+    m_dir.m_y=(m_upDir.m_y+sinf(theta)*cosf(theta))/m_var;
+    m_dir.m_z=(m_upDir.m_z+cosf(theta))/m_var;
 	}
 }

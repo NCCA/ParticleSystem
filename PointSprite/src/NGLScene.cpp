@@ -10,12 +10,8 @@
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
 
-
-
-
 NGLScene::NGLScene()
 {
-
   setTitle("Simple Projectiles");
   m_fps=0;
   m_frames=0;
@@ -94,7 +90,7 @@ void NGLScene::initializeGL()
   shader->linkProgramObject("Colour");
   (*shader)["Colour"]->use();
   // the shader will use the currently active material and light0 so set them
-  shader->setShaderParam4f("Colour",0.2f,0.2f,0.2f,1);
+  shader->setUniform("Colour",0.2f,0.2f,0.2f,1.0f);
   glEnable(GL_BLEND);
   glBlendFunc(GL_ONE, GL_ONE);
   glEnable(GL_PROGRAM_POINT_SIZE);
@@ -174,7 +170,7 @@ void NGLScene::paintGL()
 
 
   (*shader)["Colour"]->use();
-  shader->setShaderParamFromMat4("MVP",MVP);
+  shader->setUniform("MVP",MVP);
 
   glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
   ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();

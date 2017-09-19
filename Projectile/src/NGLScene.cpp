@@ -80,7 +80,7 @@ void NGLScene::initializeGL()
   shader->linkProgramObject("Phong");
   // and make it active ready to load values
   (*shader)["Phong"]->use();
-  shader->setShaderParam1i("Normalize",1);
+  shader->setUniform("Normalize",1);
 
   // now pass the modelView and projection values to the shader
   // the shader will use the currently active material and light0 so set them
