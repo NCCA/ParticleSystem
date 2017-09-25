@@ -83,7 +83,7 @@ void NGLScene::paintGL()
   mouseRotation.m_m[3][0] = m_modelPos.m_x;
   mouseRotation.m_m[3][1] = m_modelPos.m_y;
   mouseRotation.m_m[3][2] = m_modelPos.m_z;
-  ngl::Mat4 MVP=mouseRotation*m_cam.getVPMatrix();
+  ngl::Mat4 MVP=m_cam.getVPMatrix()*mouseRotation;
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
   shader->use("ColourShader");

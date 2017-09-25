@@ -64,8 +64,8 @@ void NGLScene::initializeGL()
   shader->attachShader("PhongVertex",ngl::ShaderType::VERTEX);
   shader->attachShader("PhongFragment",ngl::ShaderType::FRAGMENT);
   // attach the source
-  shader->loadShaderSource("PhongVertex","shaders/Phong.vs");
-  shader->loadShaderSource("PhongFragment","shaders/Phong.fs");
+  shader->loadShaderSource("PhongVertex","shaders/PhongVertex.glsl");
+  shader->loadShaderSource("PhongFragment","shaders/PhongFragment.glsl");
   // compile the shaders
   shader->compileShader("PhongVertex");
   shader->compileShader("PhongFragment");
@@ -90,12 +90,12 @@ void NGLScene::initializeGL()
   // the shader will use the currently active material and light0 so set them
   ngl::Material m(ngl::STDMAT::GOLD);
   m.loadToShader("material");
-  ngl::Light light(ngl::Vec3(2,2,20),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::LightModes::POINTLIGHT);
+  ngl::Light light(ngl::Vec3(2,2,2),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::LightModes::POINTLIGHT);
   // now create our light this is done after the camera so we can pass the
   // transpose of the projection matrix to the light to do correct eye space
   // transformations
   ngl::Mat4 iv=m_cam.getViewMatrix();
-  iv.transpose();
+  iv.inverse().transpose();
   light.setTransform(iv);
   light.setAttenuation(1,0,0);
   light.enable();

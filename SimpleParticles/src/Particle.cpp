@@ -47,10 +47,10 @@ void Particle::draw() const
   ngl::Mat3 normalMatrix;
   ngl::Mat4 M;
   M=trans.getMatrix();
-  MV=M*m_emitter->getCam()->getViewMatrix();
-  MVP=MV*m_emitter->getCam()->getProjectionMatrix();
+  MV=m_emitter->getCam()->getViewMatrix()*M;
+  MVP=m_emitter->getCam()->getProjectionMatrix()*MV;
   normalMatrix=MV;
-  normalMatrix.inverse();
+  normalMatrix.inverse().transpose();
   shader->setUniform("MV",MV);
   shader->setUniform("MVP",MVP);
   shader->setUniform("normalMatrix",normalMatrix);

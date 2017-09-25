@@ -150,8 +150,8 @@ void NGLScene::paintGL()
   ngl::Mat4 MV;
   ngl::Mat4 MVP;
 
-  MV=trans.getMatrix()*m_cam->getViewMatrix() ;
-  MVP=MV*m_cam->getProjectionMatrix() ;
+  MV=m_cam->getViewMatrix()*trans.getMatrix() ;
+  MVP=m_cam->getProjectionMatrix()*MV ;
 
   glBindTexture(GL_TEXTURE_2D,m_emitter1->getTextureID());
   glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
