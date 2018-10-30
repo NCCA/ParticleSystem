@@ -26,8 +26,7 @@ void NGLScene::resizeGL(int _w , int _h)
 {
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
-  m_cam.setShape(45.0f,static_cast<float>(_w)/_h,
-                 0.05f,350.0f);
+  m_project=ngl::perspective(45.0f,static_cast<float>(_w)/_h,0.05f,350.0f);
 }
 
 constexpr auto ColourShader="ColourShader";
@@ -55,8 +54,8 @@ void NGLScene::initializeGL()
 
   glPointSize(8);
   startTimer(10);
-  m_cam.set(ngl::Vec3(0,4,10),ngl::Vec3::zero(),ngl::Vec3::up());
-  m_cam.setShape(45.0,(float)width()/height(),0.5,1000000);
+  m_view=ngl::lookAt(ngl::Vec3(0,4,10),ngl::Vec3::zero(),ngl::Vec3::up());
+  m_project=ngl::perspective(45.0,(float)width()/height(),0.5f,1000.0f);
   ngl::VAOPrimitives::instance()->createTrianglePlane("ground",20,20,10,10,ngl::Vec3::up());
   glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
@@ -83,7 +82,7 @@ void NGLScene::paintGL()
   mouseRotation.m_m[3][0] = m_modelPos.m_x;
   mouseRotation.m_m[3][1] = m_modelPos.m_y;
   mouseRotation.m_m[3][2] = m_modelPos.m_z;
-  ngl::Mat4 MVP=m_cam.getVPMatrix()*mouseRotation;
+  ngl::Mat4 MVP=m_project*m_view*mouseRotation;
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
   glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
   shader->use("ColourShader");

@@ -2,7 +2,7 @@
 #define PARTICLE_H_
 
 #include <ngl/Vec3.h>
-#include <ngl/Colour.h>
+#include <ngl/Vec4.h>
 
 // pre-declare emitter class
 class Emitter;
@@ -17,7 +17,7 @@ public :
 	/// @brief a method to update the particle position
   void update();
 	/// @brief a method to draw the particle
-  void draw() const;
+  void draw(const ngl::Mat4 &_view, const ngl::Mat4 &_project) const;
 	/// @brief mutator for the particle life
 	inline void setLifeTime(int _l){m_lifetime=_l;}
 private :
@@ -34,7 +34,7 @@ private :
 	/// @brief the total lifetime of the current particle
 	int m_lifetime;
 	/// @brief colour of the particle
-	ngl::Colour m_colour;
+  ngl::Vec4 m_colour;
   const Emitter *m_emitter;
 };
 

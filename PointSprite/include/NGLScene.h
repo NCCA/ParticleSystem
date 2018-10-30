@@ -1,6 +1,5 @@
 #ifndef NGLSCENE_H_
 #define NGLSCENE_H_
-#include <ngl/PathCamera.h>
 #include <ngl/Transformation.h>
 #include <ngl/Text.h>
 #include "Emitter.h"
@@ -57,9 +56,8 @@ private:
     WinParams m_win;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief Our Camera
-    //----------------------------------------------------------------------------------------------------------------------
-    /// @brief Our Camera
-    std::unique_ptr<ngl::PathCamera> m_cam;
+    ngl::Mat4 m_view;
+    ngl::Mat4 m_project;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief transformation stack for the gl transformations etc
     //----------------------------------------------------------------------------------------------------------------------

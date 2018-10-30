@@ -2,10 +2,7 @@
 #include <QGuiApplication>
 
 #include "NGLScene.h"
-#include <ngl/Camera.h>
-#include <ngl/Light.h>
 #include <ngl/Transformation.h>
-#include <ngl/Material.h>
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
@@ -28,7 +25,7 @@ NGLScene::~NGLScene()
 
 void NGLScene::resizeGL( int _w, int _h )
 {
-  m_cam->setShape( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
+  m_project=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
@@ -45,9 +42,9 @@ void NGLScene::initializeGL()
   glEnable(GL_DEPTH_TEST);
   // enable multisampling for smoother drawing
   glEnable(GL_MULTISAMPLE);
-  m_cam.reset( new ngl::PathCamera(ngl::Vec4(0,1,-0.2f),"data/loop.dat",0.001f));
-  m_cam->setShape(40.0,1024.0f/720.0f,0.5f,150.0);
-  m_cam->updateLooped();
+  //m_cam.reset( new ngl::PathCamera(ngl::Vec4(0,1,-0.2f),"data/loop.dat",0.001f));
+  m_view=ngl::lookAt(ngl::Vec3(0,1,-0.2f),ngl::Vec3(0.0f,0.0f,0.0f),ngl::Vec3::up());
+  m_project=ngl::perspective(40.0,1024.0f/720.0f,0.5f,150.0);
   // now to load the shader and set the values
   // grab an instance of shader manager
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
@@ -105,9 +102,9 @@ void NGLScene::initializeGL()
   m_emitter1.reset(  new Emitter(ngl::Vec3(0,0,0),"textures/SmokeTest.tiff",6000));
   m_emitter2.reset(  new Emitter(ngl::Vec3(2,0,2),"textures/SmokeTest2.tiff",6000));
   m_emitter3.reset(  new Emitter(ngl::Vec3(2,0,2),"textures/SmokeTest3.tiff",6000));
-  m_emitter1->setCam(m_cam.get());
-  m_emitter2->setCam(m_cam.get());
-  m_emitter3->setCam(m_cam.get());
+  m_emitter1->setCam(m_view,m_project);
+  m_emitter2->setCam(m_view,m_project);
+  m_emitter3->setCam(m_view,m_project);
   m_emitter1->setShaderName("PointSprite");
   m_emitter2->setShaderName("PointSprite");
   m_emitter3->setShaderName("PointSprite");
@@ -150,8 +147,8 @@ void NGLScene::paintGL()
   ngl::Mat4 MV;
   ngl::Mat4 MVP;
 
-  MV=m_cam->getViewMatrix()*trans.getMatrix() ;
-  MVP=m_cam->getProjectionMatrix()*MV ;
+  MV=m_view*trans.getMatrix() ;
+  MVP=m_project*MV ;
 
   glBindTexture(GL_TEXTURE_2D,m_emitter1->getTextureID());
   glTexEnvf(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
@@ -205,7 +202,6 @@ void NGLScene::timerEvent(QTimerEvent *_event )
 	}
 	if(_event->timerId() == m_camTimer)
 	{
-		m_cam->updateLooped();
 	}
 	update();
 		// re-draw GL

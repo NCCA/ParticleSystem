@@ -16,7 +16,7 @@ Emitter::Emitter(ngl::Vec3 _pos, size_t  nParticles)
   {
     resetParticle(p);
   }
-  m_vao.reset(ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_POINTS));
+  m_vao=ngl::VAOFactory::createVAO(ngl::simpleVAO,GL_POINTS);
 
 }
 

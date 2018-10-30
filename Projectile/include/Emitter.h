@@ -1,9 +1,8 @@
 #ifndef EMITTER_H_
 #define EMITTER_H_
 #include <vector>
-#include <ngl/Camera.h>
 #include <ngl/Vec3.h>
-
+#include <ngl/Mat4.h>
 #include "Particle.h"
 
 
@@ -18,11 +17,8 @@ public :
 	/// @brief a method to update each of the particles contained in the system
 	void update();
 	/// @brief a method to draw all the particles contained in the system
-	void draw();
-  inline void setCam(ngl::Camera *_cam){m_cam=_cam;}
-  inline ngl::Camera * getCam()const {return m_cam;}
-  inline void setShaderName(const std::string &_n){m_shaderName=_n;}
-  inline const std::string getShaderName()const {return m_shaderName;}
+  void draw(const ngl::Mat4 &_view, const ngl::Mat4 &_project);
+
 private :
 	/// @brief the position of the emitter
 	ngl::Vec3 m_pos;
@@ -35,7 +31,6 @@ private :
   /// @brief the name of the shader to use
   std::string m_shaderName;
   /// @brief a pointer to the camera used for drawing
-  ngl::Camera *m_cam;
 
 };
 

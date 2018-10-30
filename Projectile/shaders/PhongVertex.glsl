@@ -6,34 +6,27 @@ uniform vec3 viewerPos;
 /// @brief the current fragment normal for the vert being processed
 out vec3 fragmentNormal;
 /// @brief the vertex passed in
-in vec3 inVert;
+layout(location=0)in vec3 inVert;
 /// @brief the normal passed in
-in vec3 inNormal;
+layout(location=1)in vec3 inNormal;
 /// @brief the in uv
-in vec2 inUV;
+layout(location=2)in vec2 inUV;
 
 struct Materials
 {
-  vec4 ambient;
-  vec4 diffuse;
-  vec4 specular;
-  float shininess;
+	vec4 ambient;
+	vec4 diffuse;
+	vec4 specular;
+	float shininess;
 };
 
 
 struct Lights
 {
-    vec4 position;
-    vec3 direction;
-    vec4 ambient;
-    vec4 diffuse;
-    vec4 specular;
-    float spotCosCutoff;
-    float spotCosInnerCutoff;
-    float spotExponent;
-    float constantAttenuation;
-    float linearAttenuation;
-    float quadraticAttenuation;
+	vec4 position;
+	vec4 ambient;
+	vec4 diffuse;
+	vec4 specular;
 };
 // our material
 uniform Materials material;
@@ -48,14 +41,13 @@ out vec3 vPosition;
 
 uniform mat4 MV;
 uniform mat4 MVP;
-uniform mat3 normalMatrix;
 uniform mat4 M;
 
 
 void main()
 {
 // calculate the fragments surface normal
-fragmentNormal = (normalMatrix*inNormal);
+fragmentNormal = inNormal;
 
 
 if (Normalize == true)
@@ -76,9 +68,8 @@ vPosition = eyeCord.xyz / eyeCord.w;;
 
 float dist;
 
-lightDir=vec3(light.position.xyz-eyeCord.xyz);
+lightDir=(MVP*vec4(light.position.xyz-eyeCord.xyz,0)).xyz;
 dist = length(lightDir);
 lightDir/= dist;
 halfVector = normalize(eyeDirection + lightDir);
-
 }

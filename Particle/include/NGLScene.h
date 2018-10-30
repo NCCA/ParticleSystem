@@ -1,8 +1,8 @@
 #ifndef NGLSCENE_H_
 #define NGLSCENE_H_
 #include <ngl/Vec3.h>
+#include <ngl/Mat4.h>
 #include "Emitter.h"
-#include <ngl/Camera.h>
 #include <memory>
 #include <QOpenGLWindow>
 #include "WindowParams.h"
@@ -30,7 +30,7 @@ class NGLScene : public QOpenGLWindow
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief dtor must close down ngl and release OpenGL resources
     //----------------------------------------------------------------------------------------------------------------------
-    ~NGLScene();
+    ~NGLScene() override;
     //----------------------------------------------------------------------------------------------------------------------
     /// @brief the initialize class is called once when the window is created and we have a valid GL context
     /// use this to setup any default GL stuff
@@ -85,7 +85,8 @@ private:
     /// position for our model
     ngl::Vec3 m_modelPos;
     std::unique_ptr<Emitter> m_emitter;
-    ngl::Camera m_cam;
+    ngl::Mat4 m_view;
+    ngl::Mat4 m_project;
 };
 
 

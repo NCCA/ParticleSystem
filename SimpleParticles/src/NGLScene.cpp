@@ -2,9 +2,6 @@
 #include <QGuiApplication>
 
 #include "NGLScene.h"
-#include <ngl/Camera.h>
-#include <ngl/Light.h>
-#include <ngl/Material.h>
 #include <ngl/NGLInit.h>
 #include <ngl/VAOPrimitives.h>
 #include <ngl/ShaderLib.h>
@@ -28,7 +25,7 @@ NGLScene::~NGLScene()
 
 void NGLScene::resizeGL( int _w, int _h )
 {
-  m_cam.setShape( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
+  m_project=ngl::perspective( 45.0f, static_cast<float>( _w ) / _h, 0.05f, 350.0f );
   m_win.width  = static_cast<int>( _w * devicePixelRatio() );
   m_win.height = static_cast<int>( _h * devicePixelRatio() );
 }
@@ -51,10 +48,10 @@ void NGLScene::initializeGL()
   ngl::Vec3 from(8,8,8);
   ngl::Vec3 to(0,0,0);
   ngl::Vec3 up(0,1,0);
-  m_cam.set(from,to,up);
+  m_view=ngl::lookAt(from,to,up);
   // set the shape using FOV 45 Aspect Ratio based on Width and Height
   // The final two are near and far clipping planes of 0.5 and 10
-  m_cam.setShape(60,720.0f/576.0f,0.5,150);
+  m_project=ngl::perspective(60,720.0f/576.0f,0.5,150);
   // now to load the shader and set the values
   // grab an instance of shader manager
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
@@ -72,13 +69,6 @@ void NGLScene::initializeGL()
   // add them to the program
   shader->attachShaderToProgram("Phong","PhongVertex");
   shader->attachShaderToProgram("Phong","PhongFragment");
-  // now bind the shader attributes for most NGL primitives we use the following
-  // layout attribute 0 is the vertex data (x,y,z)
-  shader->bindAttribute("Phong",0,"inVert");
-  // attribute 1 is the UV data u,v (if present)
-  shader->bindAttribute("Phong",1,"inUV");
-  // attribute 2 are the normals x,y,z
-  shader->bindAttribute("Phong",2,"inNormal");
 
   // now we have associated this data we can link the shader
   shader->linkProgramObject("Phong");
@@ -86,26 +76,21 @@ void NGLScene::initializeGL()
   (*shader)["Phong"]->use();
   shader->setUniform("Normalize",1);
 
-  // now pass the modelView and projection values to the shader
-  // the shader will use the currently active material and light0 so set them
-  ngl::Material m(ngl::STDMAT::GOLD);
-  m.loadToShader("material");
-  ngl::Light light(ngl::Vec3(2,2,2),ngl::Colour(1,1,1,1),ngl::Colour(1,1,1,1),ngl::LightModes::POINTLIGHT);
-  // now create our light this is done after the camera so we can pass the
-  // transpose of the projection matrix to the light to do correct eye space
-  // transformations
-  ngl::Mat4 iv=m_cam.getViewMatrix();
-  iv.inverse().transpose();
-  light.setTransform(iv);
-  light.setAttenuation(1,0,0);
-  light.enable();
-  light.loadToShader("light");
+  ngl::Vec4 lightPos(0.0f,0.0f,-2.0f,0.0f);
+  shader->setUniform("light.position",lightPos);
+  shader->setUniform("light.ambient",0.0f,0.0f,0.0f,1.0f);
+  shader->setUniform("light.diffuse",1.0f,1.0f,1.0f,1.0f);
+  shader->setUniform("light.specular",0.8f,0.8f,0.8f,1.0f);
+  // gold like phong material
+  shader->setUniform("material.ambient",0.274725f,0.1995f,0.0745f,0.0f);
+  shader->setUniform("material.diffuse",0.75164f,0.60648f,0.22648f,0.0f);
+  shader->setUniform("material.specular",0.628281f,0.555802f,0.3666065f,0.0f);
+  shader->setUniform("material.shininess",51.2f);
+
   ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
 
   prim->createSphere("sphere",0.1f,10);
   m_emitter.reset(  new Emitter(ngl::Vec3(0,0,0),2000));
-  m_emitter->setCam(&m_cam);
-  m_emitter->setShaderName("Phong");
   m_text.reset( new ngl::Text(QFont("Arial",14)));
   m_text->setScreenSize(width(),height());
   // as re-size is not explicitly called we need to do this.
@@ -123,7 +108,7 @@ void NGLScene::paintGL()
   // clear the screen and depth buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glViewport(0,0,m_win.width,m_win.height);
-  m_emitter->draw();
+  m_emitter->draw(m_view,m_project);
   // calculate and draw FPS
   ++m_frames;
   QString text=QString("Particle demo %1 fps").arg(m_fps);

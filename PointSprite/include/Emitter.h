@@ -2,7 +2,6 @@
 #define EMITTER_H_
 #include <vector>
 #include <QTime>
-#include <ngl/Camera.h>
 #include <ngl/Mat4.h>
 #include <ngl/Vec3.h>
 
@@ -23,11 +22,13 @@ public :
 	/// @brief a method to draw all the particles contained in the system
   void draw(const ngl::Mat4 &_mvp);
   GLuint getTextureID() const {return m_textureID;}
-  void setCam(ngl::Camera *_cam){m_cam=_cam;}
-  ngl::Camera * getCam()const {return m_cam;}
   void setShaderName(const std::string &_n){m_shaderName=_n;}
   const std::string getShaderName()const {return m_shaderName;}
-
+  void setCam(const ngl::Mat4 &_view, ngl::Mat4 &_project)
+  {
+    m_view=_view;
+    m_project=_project;
+  }
 private :
 	/// @brief the position of the emitter
   ngl::Vec3 m_pos;
@@ -41,8 +42,8 @@ private :
 	GLuint m_textureID;
   /// @brief the name of the shader to use
   std::string m_shaderName;
-  /// @brief a pointer to the camera used for drawing
-  ngl::Camera *m_cam;
+  ngl::Mat4 m_view;
+  ngl::Mat4 m_project;
 
 };
 

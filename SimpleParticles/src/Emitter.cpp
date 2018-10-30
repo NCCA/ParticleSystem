@@ -1,5 +1,5 @@
 #include "Emitter.h"
-
+#include <ngl/Mat4.h>
 /// @brief ctor
 /// @param _pos the position of the emitter
 /// @param _numParticles the number of particles to create
@@ -20,11 +20,11 @@ void Emitter::update()
 	}
 }
 /// @brief a method to draw all the particles contained in the system
-void Emitter::draw()
+void Emitter::draw(const ngl::Mat4 &_view, const ngl::Mat4 &_project)
 {
 	for(int i=0; i<m_numParticles; ++i)
 	{
-    m_particles[i].draw();
+    m_particles[i].draw(_view,_project);
 	}
 
 

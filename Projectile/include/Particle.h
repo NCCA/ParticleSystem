@@ -1,9 +1,8 @@
-#ifndef PARTICLE_H__
-#define PARTICLE_H__
+#ifndef PARTICLE_H_
+#define PARTICLE_H_
 
 #include <ngl/Vec3.h>
-#include <ngl/Colour.h>
-
+#include <ngl/Mat4.h>
 class Emitter;
 
 class Particle
@@ -16,7 +15,7 @@ public :
 	/// @brief a method to update the particle position
 	void update();
 	/// @brief a method to draw the particle
-	void draw();
+  void draw(const ngl::Mat4 &_view, const ngl::Mat4 &_project);
 
 private :
 	/// @brief the curent particle position

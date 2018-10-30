@@ -1,5 +1,4 @@
 #include "Particle.h"
-#include <ngl/Camera.h>
 #include <ngl/Random.h>
 #include <ngl/Transformation.h>
 #include <ngl/ShaderLib.h>
@@ -13,11 +12,11 @@ Particle::Particle(ngl::Vec3 _pos, ngl::Vec3 *_wind,  Emitter *_emitter   )
 	m_origin=_pos;
 	m_wind=_wind;
   ngl::Random *rand=ngl::Random::instance();
-	m_dir.m_x=rand->randomNumber(5)+0.5;
-	m_dir.m_y=rand->randomPositiveNumber(10)+0.5;
-	m_dir.m_z=rand->randomNumber(5)+0.5;
-	m_currentLife=0.0;
-	m_gravity=-9;//4.65;
+  m_dir.m_x=rand->randomNumber(5)+0.5f;
+  m_dir.m_y=rand->randomPositiveNumber(10.0f)+0.5f;
+  m_dir.m_z=rand->randomNumber(5)+0.5f;
+  m_currentLife=0.0f;
+  m_gravity=-9.0f;//4.65;
   m_emitter=_emitter;
 
 }
@@ -35,34 +34,34 @@ void Particle::update()
 	m_pos.m_z=m_origin.m_z+(m_wind->m_z*m_dir.m_z*m_currentLife);
 
 	// if we go below the origin re-set
-	if(m_pos.m_y <= m_origin.m_y-0.01)
+  if(m_pos.m_y <= m_origin.m_y-0.01f)
 	{
 		m_pos=m_origin;
 		m_currentLife=0.0;
 		ngl::Random *rand=ngl::Random::instance();
-		m_dir.m_x=rand->randomNumber(5)+0.5;
-		m_dir.m_y=rand->randomPositiveNumber(10)+0.5;
-		m_dir.m_z=rand->randomNumber(5)+0.5;
+    m_dir.m_x=rand->randomNumber(5)+0.5f;
+    m_dir.m_y=rand->randomPositiveNumber(10)+0.5f;
+    m_dir.m_z=rand->randomNumber(5)+0.5f;
 
 	}
 }
 /// @brief a method to draw the particle
-void Particle::draw()
+void Particle::draw(const ngl::Mat4 &_view, const ngl::Mat4 &_project)
 {
   // get the VBO instance and draw the built in teapot
   ngl::VAOPrimitives *prim=ngl::VAOPrimitives::instance();
   ngl::Transformation transform;
   ngl::ShaderLib *shader=ngl::ShaderLib::instance();
-  shader->use(m_emitter->getShaderName());
+  shader->use("Phong");
   transform.setPosition(m_pos);
   ngl::Mat4 MV;
   ngl::Mat4 MVP;
   ngl::Mat3 normalMatrix;
   ngl::Mat4 M;
   M=transform.getMatrix();
-  MV=m_emitter->getCam()->getViewMatrix()*transform.getMatrix();
+  MV=_view*transform.getMatrix();
 
-  MVP=m_emitter->getCam()->getProjectionMatrix() *MV;
+  MVP=_project *MV;
   normalMatrix=MV;
   normalMatrix.inverse().transpose();
   shader->setUniform("MV",MV);
